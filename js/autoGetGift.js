@@ -10,7 +10,7 @@ function AutoGetGift() {
 	};
 
 	var parseWithButton = function(button) {
-		var value = button.attributes[1].nodeValue;
+		var value = button.outerHTML;
 		var begin = value.indexOf("'");
 		var end = value.lastIndexOf("'");
 		return value.substring(begin + 1, end);

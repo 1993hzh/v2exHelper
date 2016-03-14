@@ -11,7 +11,7 @@ var canGetGift = function() {
 			autoGetGift = null;
 		}
 	});
-}
+};
 
 var decideToGetGift = function() {
 	console.log("Asking for is it time to get daily gift.");

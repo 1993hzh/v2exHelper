@@ -1,7 +1,7 @@
 var currentTime = function() {
 	var d = new Date();
 	return (d.getTime() - d.getTimezoneOffset() * 60000) / 1000;
-}
+};
 
 var myCookie = {
 	getCookie: function(url, cookieName, callback) {
@@ -33,7 +33,7 @@ var myCookie = {
 			console.log(JSON.stringify(cookie));
 		});
 	}
-}
+};
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log("Receive message: " + request);
@@ -65,3 +65,38 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		sendResponse({});
 	}
 });
+
+(function() {
+	setInterval(function() {
+		var notification = new Notification(GLOBAL.getUrl(), GLOBAL.getLastUpdateTime());
+		notification.execute();
+		notification = null;
+	}, 1000 * 60 * 30);
+})();
+
+var getRss = function() {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "https://www.v2ex.com/notifications", true);
+	xhr.onreadystatechange = function() {
+		var result = xhr.responseText;
+		var parser = new DOMParser();
+		var resultDOM = parser.parseFromString(result, "text/html");
+		var url = resultDOM.querySelector(".sll").value;
+		if (url) {
+			GLOBAL.setUrl(url);
+		} else {
+			console.log("Cannot find user's rss address.");
+		}
+	};
+	xhr.send();
+};
+
+(function(callback) {
+	myCookie.getCookie("https://v2ex.com", "A2", function(cookie) {
+		if (cookie.value) {
+			callback();
+		} else {
+			console.log("User didn't login.");
+		}
+	});
+})(getRss);
