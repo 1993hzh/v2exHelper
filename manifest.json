@@ -1,28 +1,25 @@
 {
-	"name": "V2exHelper",
-	"version": "1.0",
-	"description": "Helper for v2ex",
-  "manifest_version": 2,
-	"icons": 
-  { 
-    "16": "img/favicon16.png",             
-    "48": "img/favicon48.png",            
-    "128": "img/icon128.ico" 
-  },
-  "browser_action": {
-    "default_icon": "img/favicon16.png",
-    "default_title": "V2EX helper, written by Leo."
-  },
-  "background": {
-    "page": "background.html"
-  },
-  "content_scripts": [
-    {
-      "include_globs": [ "*" ],
-      "matches": ["*://*.v2ex.com/*"],
-      "js": ["js/autoGetGift.js", "js/getNotifications.js", "js/reloadComments.js", "js/execute.js"],
-      "run_at": "document_end"
-    }
-  ],
-	"permissions": ["*://*.v2ex.com/*", "cookies", "experimental", "notifications", "tabs"]
+    "name": "V2exHelper",
+    "version": "1.0",
+    "description": "Helper for v2ex",
+    "manifest_version": 2,
+    "icons": {
+        "16": "img/favicon16.png",
+        "48": "img/favicon48.png",
+        "128": "img/icon128.ico"
+    },
+    "browser_action": {
+        "default_icon": "img/favicon16.png",
+        "default_title": "V2EX helper, written by Leo."
+    },
+    "background": {
+        "page": "background.html"
+    },
+    "content_scripts": [{
+        "include_globs": ["*"],
+        "matches": ["*://*.v2ex.com/*"],
+        "js": ["js/autoGetGift.js", "js/getNotifications.js", "js/reloadComments.js", "js/execute.js"],
+        "run_at": "document_end"
+    }],
+    "permissions": ["*://*.v2ex.com/*", "cookies", "experimental", "notifications", "tabs"]
 }

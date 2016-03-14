@@ -1,27 +1,27 @@
 var GLOBAL = new Global(
-	null,
-	null
+    null,
+    null
 );
 
 function Global(url, lastUpdateTime) {
-	this.url = url;
-	this.lastUpdateTime = lastUpdateTime;
+    this.url = url;
+    this.lastUpdateTime = lastUpdateTime;
 
-	var self = this;
+    var self = this;
 
-	this.getUrl = function() {
-		return self.url;
-	};
+    this.getUrl = function() {
+        return self.url;
+    };
 
-	this.setUrl = function(newUrl) {
-		self.url = newUrl;
-	};
+    this.setUrl = function(newUrl) {
+        self.url = newUrl;
+    };
 
-	this.getLastUpdateTime = function() {
-		return self.lastUpdateTime;
-	};
+    this.getLastUpdateTime = function() {
+        return self.lastUpdateTime;
+    };
 
-	this.setLastUpdateTime = function(time) {
-		self.lastUpdateTime = time;
-	}
+    this.setLastUpdateTime = function(time) {
+        self.lastUpdateTime = time;
+    }
 }
