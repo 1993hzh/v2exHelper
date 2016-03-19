@@ -3,7 +3,7 @@ var currentTime = function() {
     return (d.getTime() - d.getTimezoneOffset() * 60000) / 1000;
 };
 
-var myCookie = {
+var CookieUtil = {
     getCookie: function(url, cookieName, callback) {
         if (!chrome.cookies) {
             chrome.cookies = chrome.experimental.cookies;
@@ -25,7 +25,7 @@ var myCookie = {
         chrome.cookies.set({
             "url": url,
             "name": cookieName,
-            "domain": ".v2ex.com",
+            "domain": "www.v2ex.com",
             "httpOnly": false,
             "value": value,
             "expirationDate": expirationDate + currentTime()
@@ -35,10 +35,70 @@ var myCookie = {
     }
 };
 
+var StorageUtil = {
+    getValue: function(key, callback) {
+        chrome.storage.sync.get(key, function(items) {
+            if (callback) {
+                callback(items);
+            }
+        });
+    },
+
+    setValue: function(key, value) {
+        var object = {};
+        object[key] = value;
+        chrome.storage.sync.set(object, function() {
+            if (chrome.extension.lastError) {
+                alert('An error occurred: ' + chrome.extension.lastError.message);
+                return;
+            }
+            console.log(JSON.stringify(object) + ' saved.');
+        });
+    }
+};
+
+var DateUtil = {
+    beforeCurrent: function(date) {
+        var current = new Date();
+
+        if (!date || !DateUtil.isValidDate(date)) {
+            StorageUtil.setValue("CurrentDate", current.toString());
+            console.log("Trying to compare date, but no date get so decide to set CurrentDate: " + JSON.stringify(current));
+            return false;
+        }
+
+        if (date.getUTCFullYear() < current.getUTCFullYear()) {
+            return true;
+        }
+
+        if (date.getUTCMonth() < current.getUTCMonth()) {
+            return true;
+        }
+
+        if (date.getUTCDate() < current.getUTCDate()) {
+            return true;
+        }
+
+        return false;
+    },
+
+    isValidDate: function(date) {
+        if (Object.prototype.toString.call(date) === "[object Date]") {
+            if (isNaN(date.getTime())) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+};
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log("Receive message: " + request);
+    console.log("Receive message: " + JSON.stringify(request));
     if (request.msg == "isLogin") {
-        myCookie.getCookie("https://v2ex.com", "A2", function(cookie) {
+        CookieUtil.getCookie("https://v2ex.com", "A2", function(cookie) {
             sendResponse({
                 msg: cookie.value
             });
@@ -48,21 +108,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         //(this will keep the message channel open to the other end until sendResponse is called).
         return true; //Important, 
     } else if (request.msg == "timing") {
-        myCookie.getCookie("https://www.v2ex.com", "Timing", function(cookie) {
-            if (cookie) {
-                sendResponse({
-                    msg: false
-                });
-            } else {
+        StorageUtil.getValue("CurrentDate", function(value) {
+            value = new Date(value['CurrentDate']);
+            if (DateUtil.beforeCurrent(value)) {
+                StorageUtil.setValue("CurrentDate", new Date().toString());
                 sendResponse({
                     msg: true
                 });
-                myCookie.setCookie("https://www.v2ex.com", "Timing", "time", 3600 * 24);
+            } else {
+                console.log("Its not time yet.");
+                sendResponse({
+                    msg: false
+                });
             }
         });
         return true;
-    } else {
-        sendResponse({});
     }
 });
 
@@ -92,7 +152,7 @@ var getRss = function() {
 };
 
 (function(callback) {
-    myCookie.getCookie("https://v2ex.com", "A2", function(cookie) {
+    CookieUtil.getCookie("https://v2ex.com", "A2", function(cookie) {
         if (cookie.value) {
             callback();
         } else {
